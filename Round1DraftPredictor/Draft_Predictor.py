@@ -23,7 +23,8 @@ class Team:
         self.pick = pick
 
     def printTeam(self):
-        print("%d. %s %s Needs: %s" % (self.pickNum, self.city, self.name, self.printNeeds()))
+        print("%d. %s %s Needs: %s" % (self.pickNum, self.city, self.name,
+                                       self.printNeeds()))
 
     def printNeeds(self):
         needsString = ""
@@ -38,11 +39,43 @@ class Team:
                 needsString = needsString + (need + ", ")
         return needsString
 
+class Predictor:
+    def __init(self, prospects, teams):
+        self.prospects = prospect
+        self.teams = teams
+
+    def predict():
+        best_prospect = prospect[0]
+        
+        for team in teams:
+            for prospect in prospects:
+                if prospect.score >= 75 and (prospect in team.needs):
+                    team.pick = prospect
+                    prospects.remove(prospect)
+                    break
+                elif prospect.score < 75 and team.pick == None:
+                    team.pick = best_prospect
+                    prospects.remove(best_prospect)
+                    break
+                elif prospect.score > best_prospect.score:
+                    best_prospect = prospect
+                    break
+
+    def display_predictions():
+        for team in teams:
+            if team.pick == None:
+                print("%s %s: None." % team.city, team.name)
+            else:
+                print("%s %s: %s %s, %s" % team.city, team.name,
+                      team.pick.firstName, team.pick.lastName,
+                      team.pick.position)
+
 ## Returns list of prospect objects.
 ## List is sorted in terms of the prospects' scores, descending.
 def getProspects():
     http = httplib2.Http()
-    status, response = http.request('http://www.nfl.com/news/story/0ap3000000641197/article/daniel-jeremiahs-top-50-prospects-for-2016-nfl-draft')
+    status, response = http.request(
+        'http://www.nfl.com/news/story/0ap3000000641197/article/daniel-jeremiahs-top-50-prospects-for-2016-nfl-draft')
     soup = BeautifulSoup(response, 'html.parser')
     prospects = []
     data = []
@@ -72,7 +105,9 @@ def getStatistics():
 ##WR:
 def getProspectStatsScore(prospect):
     http = httplib2.Http()
-    status, response = http.request('http://www.sports-reference.com/cfb/players/' + prospect.firstName + '-' + prospect.lastName + '-' + '1.html')
+    status, response = http.request(
+        'http://www.sports-reference.com/cfb/players/' + prospect.firstName +
+        '-' + prospect.lastName + '-' + '1.html')
     soup = BeautifulSoup(response, 'html.parser')
     years = 0
     stats = []
@@ -214,7 +249,8 @@ def sixtyShuttle(time):
 ## Returns list of teams sorted by pick number, descending.
 def getDraftOrder():
     http = httplib2.Http()
-    status, response = http.request('http://www.nfl.com/news/story/0ap3000000551301/article/2016-nfl-draft-order-and-needs-for-every-team')
+    status, response = http.request(
+        'http://www.nfl.com/news/story/0ap3000000551301/article/2016-nfl-draft-order-and-needs-for-every-team')
     soup = BeautifulSoup(response, 'html.parser')
     teams = []
 
@@ -222,7 +258,8 @@ def getDraftOrder():
         if b.a != None:
             teams.append(b.a.text)
 
-    status, response = http.request('http://www.nfl.com/news/story/0ap3000000572264/article/2016-nfl-draft-order-and-needs-nos-1120')
+    status, response = http.request(
+        'http://www.nfl.com/news/story/0ap3000000572264/article/2016-nfl-draft-order-and-needs-nos-1120')
     soup = BeautifulSoup(response, 'html.parser')
 
     for b in soup.find_all('b'):
@@ -240,7 +277,8 @@ def getDraftOrder():
 ## Returns a list of Team objects with all their given information
 def getTeams():
     http = httplib2.Http()
-    status, response = http.request('http://www.nfl.com/news/story/0ap3000000551301/article/2016-nfl-draft-order-and-needs-for-every-team')
+    status, response = http.request(
+        'http://www.nfl.com/news/story/0ap3000000551301/article/2016-nfl-draft-order-and-needs-for-every-team')
     soup = BeautifulSoup(response, 'html.parser')
     teams = getDraftOrder()
     fullTeam = []
@@ -254,10 +292,12 @@ def getTeams():
         otherNeeds = ''
         
         if i == 11:
-            status, response = http.request('http://www.nfl.com/news/story/0ap3000000572264/article/2016-nfl-draft-order-and-needs-nos-1120')
+            status, response = http.request(
+                'http://www.nfl.com/news/story/0ap3000000572264/article/2016-nfl-draft-order-and-needs-nos-1120')
             soup = BeautifulSoup(response, 'html.parser')
         if i == 21:
-            status, response = http.request('http://www.nfl.com/news/story/0ap3000000572265/article/2016-nfl-draft-order-and-needs-playoff-teams')
+            status, response = http.request(
+                'http://www.nfl.com/news/story/0ap3000000572265/article/2016-nfl-draft-order-and-needs-playoff-teams')
             soup = BeautifulSoup(response, 'html.parser')
 
         for p in soup.find_all('p'):
