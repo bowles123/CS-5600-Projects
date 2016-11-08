@@ -115,6 +115,58 @@ def getProspectStatsScore(prospect):
     for tr in soup.find('tbody'):
         years = years + 1
 
+def calcQBStatsScore(rating, pys, ptds, interceptions, attempts):
+    ratingScore = rating - 55
+    pysScore = pys / 38
+    ptdsScore = ptds * 2.75
+    intScore = abs((interceptions / attempts) * 100 - 100)
+    return (ratingScore + pysScore + ptdsScore + intScore) / 4
+
+def calcRBStatsScore(avgy, yards, carries, tds):
+    avgyScore = avgy * 15
+    yardsScore = yards / 14
+    carriesScore = carries / 2.5
+    tdsScore = tds * 6
+    return (avgyScore + yardsScore + carriesScore + tdsScore) / 4
+
+def calcWRStatsScore(avgy, yards, receptions, tds):
+    avgyScore = avgy * 6
+    yardsScore = yards / 12
+    receptionsScore = receptions + 25
+    tdsScore = tds * 7
+    return (avgyScore + yardsScore + receptionsScore + tdsScore) / 4
+
+def calcTEStatsScore(avgy, yards, receptions, tds):
+    avgyScore = avgy * 6
+    yardsScore = yards / 7.5
+    receptionsScore = receptions * 2.5
+    tdsScore = tds * 14
+    return (avgyScore + yardsScore + receptionsScore + tdsScore) / 4
+
+def calcDLStatsScore(sacks, tackles, position = "DT"):
+    if position == "DE":
+        sacksScore = sacks * 8
+    else:
+        sacksScore = sacks * 10
+
+    tacklesScore = tackles * 2
+    return (sacksScore + tacklesScore) / 2
+
+def calcDBStatsScore(interceptions, tackles):
+    interceptionsScore = interceptions * 20
+    tacklesScore = tackles * 2.5
+    return (interceptionsScore + tacklesScore) / 2
+
+def calcLBStatsScore(tackles, sacks, position = "LB"):
+    if position == "OLB":
+        sacksScore = sacks * 8
+        tacklesScore = tackles * 2
+    else:
+        sacksScore = sacks * 12      
+        tacklesScore = tackles / 1.25
+        
+    return (tacklesScore + sacksScore) / 2
+
 ## From NFL.com, returns list of combine results for each prospect.
 ## The index of the results list corresponds to the index of the prospects list.
 def getCombineResults():
