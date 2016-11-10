@@ -1,6 +1,8 @@
 import re
-import json
 import httplib2
+import urllib2
+import time
+import json
 from bs4 import BeautifulSoup, SoupStrainer
 
 class Prospect:
@@ -92,29 +94,64 @@ def getProspects():
 ## The index of the stats list corresponds to the index of the prospects list.
 def getStatistics():
     prospects = getProspects()
-    stats = []
+    statsScores = []
 
-    ##for prospect in prospects:
-        ##google search for: "(prospect name, (first, last)) college statistics"
-        ##get url from first result in google search
-        ##prospect.score = getProspectStatsScore(resultUrl)
-        ##pause for 5 seconds before getting the next one
+    for prospect in prospects:
+        statsScores.append(getProspectStatsScore(prospect))
 
-##Stats order
-##QB: Cmp, Att, Pct, Yds, Y/A, AY/A, TD, Int, Rate
-##WR:
 def getProspectStatsScore(prospect):
+    if 'O' in prospect.position:
+        return 0.0
+    
     http = httplib2.Http()
     status, response = http.request(
         'http://www.sports-reference.com/cfb/players/' + prospect.firstName +
         '-' + prospect.lastName + '-' + '1.html')
     soup = BeautifulSoup(response, 'html.parser')
     years = 0
+    text = []
     stats = []
 
     for tr in soup.find('tbody'):
-        years = years + 1
+        years = years + 0.5
+    years = int(years)
 
+    footer = soup.find('tfoot')
+    rows = footer.findAll('td')
+
+    for td in rows:
+        if td.text != "":
+            text.append((str(td.text)))
+    text.remove(text[0])
+
+    for stat in text:
+        stats.append(float(stat))
+
+    if prospect.position == 'QB':
+        calcQBStatsScore(stats[8], stats[3] / years, stats[6] / years, stats[7],
+                        stats[1])
+
+    if prospect.position == 'WR':
+        calcWRStatsScore(stats[2], stats[1] / years, stats[0] / years,
+                         stats[3] / years)
+
+    if prospect.position == 'RB':
+        calcRBStatsScore(stats[2], stats[1] / years, stats[0] / years,
+                         stats[3] / years)
+
+    if prospect.position == 'TE':
+        calcTEStatsScore(stats[2], stats[1] / years, stats[0] / years,
+                         stats[3] / years)
+
+    if prospect.position == 'DE' or prospect.position == 'DT':
+        calcDLStatsScore(stats[2] / years, stats[4] / years, prospect.position)
+
+    if prospect.position == 'LB' or prospect.position == 'OLB' or prospect.position == 'ILB':
+        calcLBStatsScore(stats[2] / years, stats[4] / years, prospect.position)
+
+    if prospect.position == 'CB' or prospect.position == 'S':
+        calcDBStatsScore(stats[5] / years, stats[2] / years)
+        
 def calcQBStatsScore(rating, pys, ptds, interceptions, attempts):
     ratingScore = rating - 55
     pysScore = pys / 38
@@ -171,12 +208,18 @@ def calcLBStatsScore(tackles, sacks, position = "LB"):
 ## The index of the results list corresponds to the index of the prospects list.
 def getCombineResults():
     prospects = getProspects()
+    combineScores = []
 	
-    ##for prospect in prospects:
-	##google search for: "(prospect name, (first, last)) combine results"
-        ##get url from first result in google search
-        ##prospect.score = getProspectCombineScore(resultUrl)
-        ##pause for 5 seconds before getting the next one
+    for prospect in prospects:
+        query = prospect.firstName + '+' + prospect.lastName + '+combine+results'
+        url = 'http://www.google.com/search?q=*&tbs=qdr:h'.replace("*", query)
+        headers = {'User-Agent':'Chrome'}
+        req = urrllib2.Request(url, None, headers)
+        pageString = urllib2.urlopen(req).read()
+        jsonString = json.loads(pageString)
+        results = jsonString['responseData']['results']
+        combineScores.append(getProspectCombineScore(results[0]))
+        time.sleep(5)
 
 ## Returns the score for a player's combine
 def getProspectCombineScore(url):
@@ -318,7 +361,8 @@ def getDraftOrder():
         if b.a != None:
             teams.append(b.a.text)
 
-    status, response = http.request('http://www.nfl.com/news/story/0ap3000000572265/article/2016-nfl-draft-order-and-needs-playoff-teams')
+    status, response = http.request(
+        'http://www.nfl.com/news/story/0ap3000000572265/article/2016-nfl-draft-order-and-needs-playoff-teams')
     soup = BeautifulSoup(response, 'html.parser')
 
     for b in soup.find_all('b'):
