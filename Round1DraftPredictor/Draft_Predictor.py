@@ -43,25 +43,25 @@ class Team:
         return needsString
 
 class Predictor:
-    def __init(self, prospects, teams):
+    def __init__(self, prospects, teams):
         self.prospects = prospect
         self.teams = teams
 
-    def predict():
-        best_prospect = prospect[0]
-        
+    def predict():    
         for team in teams:
+            best_prospect = prospects[0]
+            
             for prospect in prospects:
-                if prospect.score >= 75 and (prospect in team.needs):
+                if prospect.score >= 75 and prospect.position in team.needs:
                     team.pick = prospect
                     prospects.remove(prospect)
                     break
+                elif prospect.score > best_prospect.score:
+                    best_prospect = prospect
+                    continue
                 elif prospect.score < 75 and team.pick == None:
                     team.pick = best_prospect
                     prospects.remove(best_prospect)
-                    break
-                elif prospect.score > best_prospect.score:
-                    best_prospect = prospect
                     break
 
     def display_predictions():
