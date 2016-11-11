@@ -2,7 +2,7 @@ import re
 import httplib2
 import urllib2
 import time
-import json
+import json as m_json
 from bs4 import BeautifulSoup, SoupStrainer
 
 class Prospect:
@@ -14,7 +14,8 @@ class Prospect:
         self.score = score
 
     def printProspect(self):
-        print("%s, %s - %s" % (self.lastName, self.firstName, self.position))
+        print("%s, %s - %s [%d]" % (self.lastName, self.firstName, self.position,
+                                    self.score))
 
 class Team:
     def __init__(self, city, name, pickNum, needs, pick = None):
@@ -88,29 +89,32 @@ def getProspects():
     for prospect in data:
         metadata = prospect.split(' - ')
         names = metadata[0].split(' ')
-        prospects.append(Prospect(names[0], names[1], metadata[1].split(' ')[0]))
+        prospects.append(Prospect(names[0], names[1], metadata[1].split(', ')[0]))
     return prospects
 
 ## The index of the stats list corresponds to the index of the prospects list.
-def getStatistics():
+def getStatisticsScores():
     prospects = getProspects()
     statsScores = []
 
     for prospect in prospects:
         statsScores.append(getProspectStatsScore(prospect))
+    return statsScores
 
-def getProspectStatsScore(prospect):
-    if 'O' in prospect.position:
+def getProspectStatsScore(prospect): 
+    if 'O' in prospect.position or 'C' in prospect.position:
         return 0.0
     
     http = httplib2.Http()
     status, response = http.request(
-        'http://www.sports-reference.com/cfb/players/' + prospect.firstName +
-        '-' + prospect.lastName + '-' + '1.html')
+        'http://www.sports-reference.com/cfb/players/' + prospect.firstName.lower() +
+        '-' + prospect.lastName.lower() + '-' + '1.html')
     soup = BeautifulSoup(response, 'html.parser')
     years = 0
-    text = []
     stats = []
+
+    if soup.find('tbody') == None:
+        return 0.0
 
     for tr in soup.find('tbody'):
         years = years + 0.5
@@ -121,36 +125,36 @@ def getProspectStatsScore(prospect):
 
     for td in rows:
         if td.text != "":
-            text.append((str(td.text)))
-    text.remove(text[0])
-
-    for stat in text:
-        stats.append(float(stat))
+            stats.append(str(td.text))
+    stats.remove(stats[0])
 
     if prospect.position == 'QB':
-        calcQBStatsScore(stats[8], stats[3] / years, stats[6] / years, stats[7],
-                        stats[1])
+        return calcQBStatsScore(float(stats[8]), float(stats[3]) / years,
+                                float(stats[6]) / years, float(stats[7]),
+                                float(stats[1]))
 
     if prospect.position == 'WR':
-        calcWRStatsScore(stats[2], stats[1] / years, stats[0] / years,
-                         stats[3] / years)
+        return calcWRStatsScore(float(stats[2]), float(stats[1]) / years,
+                                float(stats[0]) / years, float(stats[3]) / years)
 
     if prospect.position == 'RB':
-        calcRBStatsScore(stats[2], stats[1] / years, stats[0] / years,
-                         stats[3] / years)
+        return calcRBStatsScore(float(stats[2]), float(stats[1]) / years,
+                                float(stats[0]) / years, float(stats[3]) / years)
 
     if prospect.position == 'TE':
-        calcTEStatsScore(stats[2], stats[1] / years, stats[0] / years,
-                         stats[3] / years)
+        return calcTEStatsScore(float(stats[2]), float(stats[1]) / years,
+                                float(stats[0]) / years, float(stats[3]) / years)
 
     if prospect.position == 'DE' or prospect.position == 'DT':
-        calcDLStatsScore(stats[2] / years, stats[4] / years, prospect.position)
+        return calcDLStatsScore(float(stats[4]) / years, float(stats[2]) / years,
+                                prospect.position)
 
     if prospect.position == 'LB' or prospect.position == 'OLB' or prospect.position == 'ILB':
-        calcLBStatsScore(stats[2] / years, stats[4] / years, prospect.position)
+        return calcLBStatsScore(float(stats[2]) / years, float(stats[4]) / years,
+                                prospect.position)
 
     if prospect.position == 'CB' or prospect.position == 'S':
-        calcDBStatsScore(stats[5] / years, stats[2] / years)
+        return calcDBStatsScore(float(stats[5]) / years, float(stats[2]) / years)
         
 def calcQBStatsScore(rating, pys, ptds, interceptions, attempts):
     ratingScore = rating - 55
@@ -180,6 +184,7 @@ def calcTEStatsScore(avgy, yards, receptions, tds):
     tdsScore = tds * 14
     return (avgyScore + yardsScore + receptionsScore + tdsScore) / 4
 
+## Probably needs to be adjusted
 def calcDLStatsScore(sacks, tackles, position = "DT"):
     if position == "DE":
         sacksScore = sacks * 8
@@ -189,11 +194,13 @@ def calcDLStatsScore(sacks, tackles, position = "DT"):
     tacklesScore = tackles * 2
     return (sacksScore + tacklesScore) / 2
 
+## Probably needs to be adjusted, at least for the 'S' position.
 def calcDBStatsScore(interceptions, tackles):
     interceptionsScore = interceptions * 20
     tacklesScore = tackles * 2.5
     return (interceptionsScore + tacklesScore) / 2
 
+## Probably needs to be adjusted.
 def calcLBStatsScore(tackles, sacks, position = "LB"):
     if position == "OLB":
         sacksScore = sacks * 8
@@ -214,11 +221,11 @@ def getCombineResults():
         query = prospect.firstName + '+' + prospect.lastName + '+combine+results'
         url = 'http://www.google.com/search?q=*&tbs=qdr:h'.replace("*", query)
         headers = {'User-Agent':'Chrome'}
-        req = urrllib2.Request(url, None, headers)
+        req = urllib2.Request(url, None, headers)
         pageString = urllib2.urlopen(req).read()
-        jsonString = json.loads(pageString)
-        results = jsonString['responseData']['results']
-        combineScores.append(getProspectCombineScore(results[0]))
+
+        ## unsure how to get the first url in search result.
+        ##combineScores.append(getProspectCombineScore(results[0]))
         time.sleep(5)
 
 ## Returns the score for a player's combine
