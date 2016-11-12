@@ -59,10 +59,10 @@ class Predictor:
                 elif prospect.score > best_prospect.score:
                     best_prospect = prospect
                     continue
-                elif prospect.score < 75 and team.pick == None:
-                    team.pick = best_prospect
-                    prospects.remove(best_prospect)
-                    break
+                
+            if team.pick == None:
+                team.pick = best_prospect
+                prospects.remove(best_prospect)
 
     def display_predictions():
         for team in teams:
@@ -447,5 +447,12 @@ def getTeams():
 
 ## Scores the prospect based on stats and combine results
 ## Stats account for 60% of the score while the combine accounts for 40%
-def scoreProspect(statsScore, combineScore):
-    score = ((statsScore * 3) + (combineScore * 2)) / 7
+def scoreProspects():
+    stats = getStatisticsScores()
+    combine = getCombineResults()
+    prospects = getProspects()
+    i = 0
+
+    for prospect in prospects:
+        prospect.score = ((stats[i] * 3) + (combine[i] * 2)) / 7
+        i = i + 1
