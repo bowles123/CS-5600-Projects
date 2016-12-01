@@ -38,7 +38,7 @@ class NaivePredictor:
         cyi = ri = ctdsi = ti = si = intsi = pdi = ffi = 0
 
         for prospect in self.prospects:
-            if len(prospect.stats) == 1:
+            if len(filter(lambda num: num != '0', prospect.stats)) == 0:
                 continue
             
             if prospect.position == 'QB':
@@ -164,7 +164,7 @@ class NaivePredictor:
             combineScore = combineScore / len(filter(
                 lambda num: num != '0', prospect.combine))
 
-            if len(prospect.stats) == 1:
+            if len(filter(lambda num: num != '0', prospect.stats)) == 0:
                 prospect.score = combineScore
             else:
                 statsScore = statsScore / len(filter(
@@ -183,9 +183,6 @@ class NaivePredictor:
                     team.pick = prospect
                     self.prospects.remove(prospect)
                     break
-                elif prospect.score > best_prospect.score:
-                    best_prospect = prospect
-                    continue
                 
             if team.pick == None:
                 team.pick = best_prospect
@@ -210,7 +207,7 @@ def initializePredictor(fileName):
     data.remove(data[0])
 
     string = ''.join(data)
-    data = string.split('\n\t\nTeams:\n\t')
+    data = string.split('\n\nTeams (2016):\n\t')
     teams = data[1].split('\n\t')
     prospects = data[0].split('\n\t')
     prospects[0] = prospects[0][1:]
