@@ -1,5 +1,6 @@
-class Prospect:
-    
+draftResults = {}
+
+class Prospect:   
     def __init__(self, name, position, stats, combine, score = 0.0):
         self.name = name
         self.position = position
@@ -9,6 +10,15 @@ class Prospect:
 
     def printProspect(self):
         print("%s - %s [%f]" % (self.name, self.position, self.score))
+
+    def equals(self, prospect):
+        if prospect == None:
+            return False
+        
+        if self.name == prospect.name:
+            if self.position == prospect.position:
+                return True
+        return False
 
 class Team:
     def __init__(self, name, pickNum, needs, pick = None):
@@ -140,39 +150,55 @@ class NaivePredictor:
         self.combineAverages.append(twenties / ti)
         self.combineAverages.append(sixties / si)
 
-    def calculateScores(self):
+    def calculateCombineScore(self, prospect):
+        i = 0
+        combineScore = 0.0
+
+        for score in prospect.combine:
+            score = min(float(score) / self.combineAverages[i], 1.0)
+            combineScore = combineScore + score
+            i = i + 1
+            
+        return combineScore / len(filter(
+            lambda num: num != '0', prospect.combine))
+
+    def calculateStatsScore(self, prospect):
+        i = 0
+        statsScore = 0.0
+            
+        for score in prospect.stats:
+            score = min(float(score) / self.statsAverages[i], 1.0)
+            statsScore = statsScore + score
+            i = i + 1
+        if len(filter(lambda num: num != '0', prospect.stats)) == 0:
+            return 0
+        return statsScore / len(filter(
+            lambda num: num != '0', prospect.stats))
+
+    def calculateScores(self, combine, stats):
         self.calculateCombineAverages()
         self.calculateStatsAverages()
         
         for prospect in self.prospects:
-            i = 0
-            combineScore = statsScore = 0.0
-
-            for score in prospect.combine:
-                score = min(float(score) / self.combineAverages[i], 1.0)
-                combineScore = combineScore + score
-                i = i + 1
-                
-            i = 0
-            
-            if len(prospect.stats) > 1:
-                for score in prospect.stats:
-                    score = min(float(score) / self.statsAverages[i], 1.0)
-                    statsScore = statsScore + score
-                    i = i + 1
-
-            combineScore = combineScore / len(filter(
-                lambda num: num != '0', prospect.combine))
-
-            if len(filter(lambda num: num != '0', prospect.stats)) == 0:
-                prospect.score = combineScore
+            if stats:
+                statsScore = self.calculateStatsScore(prospect)
             else:
-                statsScore = statsScore / len(filter(
-                    lambda num: num != '0', prospect.stats))
-                prospect.score = ((statsScore * 3) + (combineScore * 2)) / 5
+                statsScore = 0.0
 
-    def predict(self):
-        self.calculateScores()
+            if combine:
+                combineScore = self.calculateCombineScore(prospect)
+            else:
+                combineScore = 0.0
+
+            if combine and stats:
+                prospect.score = ((statsScore * 3) + (combineScore * 2)) / 5
+            elif not combine:
+                prospect.score = statsScore
+            else:
+                prospect.score = combineScore
+
+    def predict(self, combine, stats):        
+        self.calculateScores(combine, stats)
         self.prospects.sort(key=lambda prospect: prospect.score, reverse = True)
         
         for team in self.teams:
@@ -188,6 +214,17 @@ class NaivePredictor:
                 team.pick = best_prospect
                 self.prospects.remove(best_prospect)
         self.display_predictions()
+        print("%d%% accuracy." % self.calculateAccuracy())
+
+    def calculateAccuracy(self):
+        results = draftResults[2016]
+        correct = i = 0
+        
+        for team in self.teams:
+            if team.pick.equals(results[i].pick):
+                correct = correct + 1
+            i = i + 1
+        return (correct / len(self.teams)) * 100
 
     def display_predictions(self):
         for team in self.teams:
@@ -201,9 +238,11 @@ def initializePredictor(fileName):
     data = []
     fullTeams = []
     fullProspects = []
+    yearResults = []
     
     with open(fileName) as inFile:
         data = inFile.readlines()
+    year = data[0].split(' ')[1][1:-3]
     data.remove(data[0])
 
     string = ''.join(data)
@@ -214,7 +253,18 @@ def initializePredictor(fileName):
 
     for team in teams:
         teamData = team.split('. ')
+        team = Team(teamData[1], int(teamData[0]), teamData[2])
         fullTeams.append(Team(teamData[1], int(teamData[0]), teamData[2]))
+        prospect = teamData[3].split(' ')
+
+        if len(prospect) > 1:
+            team.pick = Prospect(prospect[1] + " " + prospect[2],
+                                 prospect[0], [], [])
+        else:
+            team.pick = None
+            
+        yearResults.append(team)
+    draftResults[int(year)] = yearResults
 
     for prospect in prospects:
         prospectData = prospect.split('. ')
