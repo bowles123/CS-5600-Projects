@@ -37,6 +37,14 @@ class Prospect:
         self.combine = combine
         self.score = score
 
+    def equals(self, prospect):
+        if prospect == None:
+            return False
+
+        if prospect.name == self.name && prospect.position == self.position:
+            return True
+        return False
+
     def printProspect(self):
         print("%s - %s [%f]" % (self.name, self.position, self.score))
 
@@ -71,6 +79,12 @@ class LearningPredictor:
     def getData(testFile, trainingTestFile):
         self.testSet = getTestSet(testFile , "2016")
         self.trainingSet = getTrainingSet(["2015", "2014", "2013"])
+
+    def train():
+        
+
+    def predict():
+        
 
 def getTrainingSet(years):
     train = []
