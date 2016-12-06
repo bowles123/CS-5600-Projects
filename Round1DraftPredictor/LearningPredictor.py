@@ -6,7 +6,7 @@ from pybrain.datasets import SupervisedDataSet
 draftResults = {}
 
 positionMap = {
-    'QB': '1000000000', 'RB': '100000000', 'WR': '0010000000', 'TE': '0001000000',
+    'QB': '1000000000', 'RB': '0100000000', 'WR': '0010000000', 'TE': '0001000000',
     'OT': '0000100000', 'OG': '0000100000', 'DL': '0000010000', 'LB': '0000001000',
     'DB': '0000000100', 'P': '0000000010', 'K': '0000000001', 'OL': '0000100000',
     'DE': '0000010000', 'DT': '0000010000', 'CB': '0000000100', 'S': '0000000100',
@@ -20,7 +20,7 @@ orderMap = {
     '3': '11111111111111111111111111111101', '4': '11111111111111111111111111111011',
     '5': '11111111111111111111111111110111', '6': '11111111111111111111111111101111',
     '7': '11111111111111111111111111011111', '8': '11111111111111111111111110111111',
-    '8': '11111111111111111111111101111111', '10': '11111111111111111111111011111111',
+    '9': '11111111111111111111111101111111', '10': '11111111111111111111111011111111',
     '11': '11111111111111111111110111111111', '12': '11111111111111111111101111111111',
     '13': '11111111111111111111011111111111', '14': '11111111111111111110111111111111',
     '15': '11111111111111111101111111111111', '16': '11111111111111111011111111111111',
@@ -87,13 +87,14 @@ class LearningPredictor:
         self.testData = {}
         self.trainingData = {}
         self.getData(testSet)
-        self.neuralNet = buildNetwork(2, 3, 1, bias=True,
+        ## What type of a Network should this be and how to structure it?
+        self.neuralNet = buildNetwork(68, 3, 1, bias=True,
                                  hiddenclass=TanhLayer)
 
     def getData(self, testFile):
         self.testData = getDataSet(testFile , "2016")
         self.trainingData = getTrainingSet(["2015", "2014", "2013"])
-        draftResults = testData.get("2016")[1]
+        draftResults = self.testData.get("2016")[1]
 
     def train(self): 
         trainer = BackpropTrainer(self.neuralNet, self.buildDataSet())
@@ -101,6 +102,7 @@ class LearningPredictor:
         print(error)
 
     def predict(self):
+        self.train
         teams = self.testData.get('2016')[0]
         prospects = self.testData.get('2016')[1]
 
@@ -108,11 +110,12 @@ class LearningPredictor:
             for prospect in prospects:
                 Input = []
                 inNeeds = int(prospect.position in team.needs)
-                position = stringToList(prospect.position)
-                pickNum = stringToList(team.pickNum)
 
-                Input.append(inNeeds).extend(position).extend(pickNum)
-                Input.extend(stats).extend(combine)
+                Input.append(inNeeds)
+                Input.extend(stringToList(prospect.position))
+                Input.extend(stringToList(team.pickNum))
+                Input.extend(prospect.stats)
+                Input.extend(prospect.combine)
                 
                 if self.neuralNetwork.activate(Input):
                     team.pick = prospect
@@ -138,7 +141,7 @@ class LearningPredictor:
                                          team.pick.name))
 
     def buildDataSet(self):
-        dataSet = SupervisedDataSet(5, 1)
+        dataSet = SupervisedDataSet(68, 1)
         
         for year in self.trainingData:
             for key, value in year.items():
@@ -146,12 +149,16 @@ class LearningPredictor:
 
                 for team in tpl[0]:
                     for prospect in tpl[1]:
-                        dataSet.addSample([int(prospect.position in team.needs),
-                                           stringToList(prospect.position),
-                                           stringToList(team.pickNum),
-                                           prospect.stats,
-                                           prospect.combine],
-                        (int(prospect.equals(team.pick)),))
+                        Input = []
+                        inNeeds = int(prospect.position in team.needs)
+                        Input.append(inNeeds)
+                        Input.extend(stringToList(prospect.position))
+                        Input.extend(stringToList(team.pickNum))
+                        Input.extend(prospect.stats)
+                        Input.extend(prospect.combine)
+                        
+                        dataSet.addSample(Input,
+                                          (int(prospect.equals(team.pick)),))
         return dataSet
 
 def getTrainingSet(years):
@@ -186,10 +193,12 @@ def getDataSet(fileName, year):
             teamData[2][i] = positionMap.get(need)
             i = i + 1
             
-        pickData = teamData[3].split(' ')     
+        pickData = teamData[3].split(' ')
+        prospect = None
+        if len(pickData) > 1:
+            prospect = Prospect(pickData[1] + pickData[2], pickData[0], [], [])    
         fullTeams.append(Team(teamData[1], orderMap.get(teamData[0]), teamData[2],
-                              Prospect(pickData[2], pickData[3], pickData[1],
-                                       [], [])))
+                              prospect))
 
     for prospect in prospects:
         prospectData = prospect.split('. ')
