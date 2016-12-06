@@ -113,20 +113,21 @@ class LearningPredictor:
             team.pick = None
             
             for prospect in prospects:
-                Input = []
-                inNeeds = int(prospect.position in team.needs)
-
-                Input.append(inNeeds)
+                best = -1000
+                best_prospect = None
+                Input = [int(prospect.position in team.needs)]
                 Input.extend(stringToList(prospect.position))
                 Input.extend(stringToList(team.pickNum))
                 Input.extend(prospect.stats)
                 Input.extend(prospect.combine)
                 output = self.neuralNet.activate(Input)[0]
                 
-                if self.neuralNet.activate(Input)[0] >= 0.0:
-                    team.pick = prospect
-                    prospects.remove(prospect)
-                    continue
+                if output > best:
+                    best = output
+                    best_prospect = prospect
+
+            team.pick = best_prospect
+            prospects.remove(prospect)
 
         self.display_predictions(teams)
         self.calculateAccuracy(teams)
@@ -141,7 +142,7 @@ class LearningPredictor:
             if team.pick.equals(results[i].pick):
                 correct = correct + 1
             i = i + 1
-        return (correct / len(self.teams)) * 100
+        return (correct / len(teams)) * 100
 
     def display_predictions(self, teams):
         for team in teams:
