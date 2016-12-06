@@ -93,6 +93,7 @@ class LearningPredictor:
     def getData(self, testFile):
         self.testData = getDataSet(testFile , "2016")
         self.trainingData = getTrainingSet(["2015", "2014", "2013"])
+        draftResults = testData.get("2016")[1]
 
     def train(self): 
         trainer = BackpropTrainer(self.neuralNet, self.buildDataSet())
@@ -105,7 +106,15 @@ class LearningPredictor:
 
         for team in teams:
             for prospect in prospects:
-                if self.neuralNetwork.activate():
+                Input = []
+                inNeeds = int(prospect.position in team.needs)
+                position = stringToList(prospect.position)
+                pickNum = stringToList(team.pickNum)
+
+                Input.append(inNeeds).extend(position).extend(pickNum)
+                Input.extend(stats).extend(combine)
+                
+                if self.neuralNetwork.activate(Input):
                     team.pick = prospect
                     continue
 
@@ -176,8 +185,11 @@ def getDataSet(fileName, year):
         for need in teamData[2]:
             teamData[2][i] = positionMap.get(need)
             i = i + 1
-        
-        fullTeams.append(Team(teamData[1], orderMap.get(teamData[0]), teamData[2]))
+            
+        pickData = teamData[3].split(' ')     
+        fullTeams.append(Team(teamData[1], orderMap.get(teamData[0]), teamData[2],
+                              Prospect(pickData[2], pickData[3], pickData[1],
+                                       [], [])))
 
     for prospect in prospects:
         prospectData = prospect.split('. ')
