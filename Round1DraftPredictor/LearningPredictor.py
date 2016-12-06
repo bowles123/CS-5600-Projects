@@ -87,8 +87,7 @@ class LearningPredictor:
         self.testData = {}
         self.trainingData = {}
         self.getData(testSet)
-        ## What type of a Network should this be and how to structure it?
-        self.neuralNet = buildNetwork(68, 3, 1, bias=True,
+        self.neuralNet = buildNetwork(68, 20, 1, bias=True,
                                  hiddenclass=TanhLayer)
 
     def getData(self, testFile):
@@ -98,7 +97,12 @@ class LearningPredictor:
 
     def train(self): 
         trainer = BackpropTrainer(self.neuralNet, self.buildDataSet())
-        error = trainer.trainUntilConvergence()
+        epoch = 0
+
+        while epoch <= 25:
+            error = trainer.train()
+            print(error)
+            epoch = epoch + 1
 
     def predict(self):
         self.train()
@@ -153,6 +157,19 @@ class LearningPredictor:
         for year in self.trainingData:
             for key, value in year.items():
                 tpl = value
+                teams = tpl[0]
+                shuffle(teams)
+
+                for team in teams:
+                    for prospect in tpl[1]:
+                        if prospect.equals(team.pick):
+                            Input = [int(prospect.position in team.needs)]
+                            Input.extend(stringToList(prospect.position))
+                            Input.extend(stringToList(team.pickNum))
+                            Input.extend(prospect.stats)
+                            Input.extend(prospect.combine)
+
+                            dataSet.addSample(Input, 1)
 
                 for team in tpl[0]:
                     for prospect in tpl[1]:
