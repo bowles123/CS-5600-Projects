@@ -2,6 +2,7 @@ from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.structure import TanhLayer
 from pybrain.datasets import SupervisedDataSet
+from random import shuffle
 
 draftResults = {}
 
@@ -101,7 +102,6 @@ class LearningPredictor:
 
         while epoch <= 25:
             error = trainer.train()
-            print(error)
             epoch = epoch + 1
 
     def predict(self):
@@ -136,6 +136,8 @@ class LearningPredictor:
         correct = i = 0
         
         for team in teams:
+            if team.pick == None:
+                continue
             if team.pick.equals(results[i].pick):
                 correct = correct + 1
             i = i + 1
@@ -158,31 +160,50 @@ class LearningPredictor:
             for key, value in year.items():
                 tpl = value
                 teams = tpl[0]
-                shuffle(teams)
+                i = 0
 
-                for team in teams:
-                    for prospect in tpl[1]:
-                        if prospect.equals(team.pick):
-                            Input = [int(prospect.position in team.needs)]
-                            Input.extend(stringToList(prospect.position))
-                            Input.extend(stringToList(team.pickNum))
-                            Input.extend(prospect.stats)
-                            Input.extend(prospect.combine)
-
-                            dataSet.addSample(Input, 1)
+                while i < 80:
+                    for team in teams:
+                        for prospect in tpl[1]:
+                            if prospect.equals(team.pick):
+                                Input = [int(prospect.position in team.needs)]
+                                Input.extend(stringToList(prospect.position))
+                                Input.extend(stringToList(team.pickNum))
+                                Input.extend(prospect.stats)
+                                Input.extend(prospect.combine)
+                                dataSet.addSample(Input, (1, ))
+                                
+                    shuffle(teams)
+                    i = i + 1
 
                 for team in tpl[0]:
                     for prospect in tpl[1]:
-                        Input = []
-                        inNeeds = int(prospect.position in team.needs)
-                        Input.append(inNeeds)
+                        Output = -1
+                        Input = [int(prospect.position in team.needs)]
                         Input.extend(stringToList(prospect.position))
                         Input.extend(stringToList(team.pickNum))
                         Input.extend(prospect.stats)
                         Input.extend(prospect.combine)
-                        
-                        dataSet.addSample(Input,
-                                          (int(prospect.equals(team.pick)),))
+
+                        if prospect.equals(team.pick):
+                            Output = 1                     
+                        dataSet.addSample(Input, (Output,))
+
+                i = 0
+                while i < 80:
+                    for team in teams:
+                        for prospect in tpl[1]:
+                            if prospect.equals(team.pick):
+                                Input = [int(prospect.position in team.needs)]
+                                Input.extend(stringToList(prospect.position))
+                                Input.extend(stringToList(team.pickNum))
+                                Input.extend(prospect.stats)
+                                Input.extend(prospect.combine)
+                                dataSet.addSample(Input, (1, ))
+                                
+                        shuffle(teams)
+                        i = i + 1
+                            
         return dataSet
 
 def getTrainingSet(years):
