@@ -94,19 +94,20 @@ class LearningPredictor:
     def getData(self, testFile):
         self.testData = getDataSet(testFile , "2016")
         self.trainingData = getTrainingSet(["2015", "2014", "2013"])
-        draftResults = self.testData.get("2016")[1]
+        draftResults['2016'] = self.testData.get("2016")[0]
 
     def train(self): 
         trainer = BackpropTrainer(self.neuralNet, self.buildDataSet())
         error = trainer.trainUntilConvergence()
-        print(error)
 
     def predict(self):
-        self.train
+        self.train()
         teams = self.testData.get('2016')[0]
         prospects = self.testData.get('2016')[1]
 
         for team in teams:
+            team.pick = None
+            
             for prospect in prospects:
                 Input = []
                 inNeeds = int(prospect.position in team.needs)
@@ -116,28 +117,34 @@ class LearningPredictor:
                 Input.extend(stringToList(team.pickNum))
                 Input.extend(prospect.stats)
                 Input.extend(prospect.combine)
+                output = self.neuralNet.activate(Input)[0]
                 
-                if self.neuralNetwork.activate(Input):
+                if self.neuralNet.activate(Input)[0] >= 0.0:
                     team.pick = prospect
+                    prospects.remove(prospect)
                     continue
 
-    def calculateAccuracy(self):
-        results = draftResults[2016]
+        self.display_predictions(teams)
+        self.calculateAccuracy(teams)
+
+    def calculateAccuracy(self, teams):
+        results = draftResults['2016']
         correct = i = 0
         
-        for team in self.teams:
+        for team in teams:
             if team.pick.equals(results[i].pick):
                 correct = correct + 1
             i = i + 1
         return (correct / len(self.teams)) * 100
 
-    def display_predictions(self):
-        for team in self.teams:
+    def display_predictions(self, teams):
+        for team in teams:
+            number = int(orderMap.keys()[orderMap.values().index(team.pickNum)])
             if team.pick == None:
-                print("%s: None." % (team.name))
+                print("%d. %s: None." % (number, team.name))
             else:
-                print("%d. %s: %s %s" % (team.pickNum, team.name,
-                                         team.pick.position,
+                position = positionMap.keys()[positionMap.values().index(team.pick.position)]
+                print("%d. %s: %s %s" % (number, team.name, position,
                                          team.pick.name))
 
     def buildDataSet(self):
@@ -196,7 +203,8 @@ def getDataSet(fileName, year):
         pickData = teamData[3].split(' ')
         prospect = None
         if len(pickData) > 1:
-            prospect = Prospect(pickData[1] + pickData[2], pickData[0], [], [])    
+            prospect = Prospect(pickData[1] + " " + pickData[2],
+                                positionMap.get(pickData[0]), [], [])    
         fullTeams.append(Team(teamData[1], orderMap.get(teamData[0]), teamData[2],
                               prospect))
 
