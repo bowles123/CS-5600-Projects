@@ -4,8 +4,6 @@ from pybrain.structure import TanhLayer
 from pybrain.datasets import SupervisedDataSet
 from random import shuffle
 
-draftResults = {}
-
 positionMap = {
     'QB': '1000000000', 'RB': '0100000000', 'WR': '0010000000', 'TE': '0001000000',
     'OT': '0000100000', 'OG': '0000100000', 'DL': '0000010000', 'LB': '0000001000',
@@ -94,7 +92,6 @@ class LearningPredictor:
     def getData(self, testFile):
         self.testData = getDataSet(testFile , "2016")
         self.trainingData = getTrainingSet(["2015", "2014", "2013"])
-        draftResults['2016'] = self.testData.get("2016")[0]
 
     def train(self): 
         trainer = BackpropTrainer(self.neuralNet, self.buildDataSet())
@@ -130,19 +127,19 @@ class LearningPredictor:
             prospects.remove(prospect)
 
         self.display_predictions(teams)
-        self.calculateAccuracy(teams)
+        print("%d%% of picks in team needs." % self.calculateAccuracy(teams))
 
     def calculateAccuracy(self, teams):
-        results = draftResults['2016']
-        correct = i = 0
+        inNeeds = 0
+        i = 0
         
         for team in teams:
             if team.pick == None:
                 continue
-            if team.pick.equals(results[i].pick):
-                correct = correct + 1
+            if team.pick.position in team.needs:
+                inNeeds = inNeeds + 1
             i = i + 1
-        return (correct / len(teams)) * 100
+        return (float(inNeeds) / float(len(teams))) * 100.0
 
     def display_predictions(self, teams):
         for team in teams:

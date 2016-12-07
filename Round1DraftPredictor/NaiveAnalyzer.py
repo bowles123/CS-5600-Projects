@@ -1,5 +1,3 @@
-draftResults = {}
-
 class Prospect:   
     def __init__(self, name, position, stats, combine, score = 0.0):
         self.name = name
@@ -214,17 +212,17 @@ class NaivePredictor:
                 team.pick = best_prospect
                 self.prospects.remove(best_prospect)
         self.display_predictions()
-        print("%d%% accuracy." % self.calculateAccuracy())
+        print("%d%% of picks in team needs." % self.calculateAccuracy())
 
     def calculateAccuracy(self):
-        results = draftResults[2016]
-        correct = i = 0
+        inNeeds = 0
+        i = 0
         
         for team in self.teams:
-            if team.pick.equals(results[i].pick):
-                correct = correct + 1
+            if team.pick.position in team.needs:
+                inNeeds = inNeeds + 1
             i = i + 1
-        return (correct / len(self.teams)) * 100
+        return (float(inNeeds) / float(len(self.teams))) * 100.0
 
     def display_predictions(self):
         for team in self.teams:
@@ -238,7 +236,6 @@ def initializePredictor(fileName):
     data = []
     fullTeams = []
     fullProspects = []
-    yearResults = []
     
     with open(fileName) as inFile:
         data = inFile.readlines()
@@ -255,16 +252,6 @@ def initializePredictor(fileName):
         teamData = team.split('. ')
         team = Team(teamData[1], int(teamData[0]), teamData[2])
         fullTeams.append(Team(teamData[1], int(teamData[0]), teamData[2]))
-        prospect = teamData[3].split(' ')
-
-        if len(prospect) > 1:
-            team.pick = Prospect(prospect[1] + " " + prospect[2],
-                                 prospect[0], [], [])
-        else:
-            team.pick = None
-            
-        yearResults.append(team)
-    draftResults[int(year)] = yearResults
 
     for prospect in prospects:
         prospectData = prospect.split('. ')

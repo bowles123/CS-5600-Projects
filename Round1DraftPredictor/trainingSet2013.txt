@@ -3,7 +3,7 @@ Prospects (2013):
 	2. Sharrif Floyd. DT. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 2.25, 0, 0.5, 0.5]. [9.42, 4.92, 0, 30, 106, 7.40, 4.75, 0]
 	3. Luke Joeckel. OT. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. [9.53, 5.30, 27, 28.5, 106, 7.40, 4.68, 0]
 	4. Chance Warmack. OG. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. [9.39, 5.49, 0, 0, 110, 0, 0, 0]
-	5. Dion Jordan. DE/OLB. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30.25, 3.63, 0, 0.5, 1]. [9.35, 4.60, 0, 32.5, 122, 7.02, 4.35, 0]
+	5. Dion Jordan. OLB. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30.25, 3.63, 0, 0.5, 1]. [9.35, 4.60, 0, 32.5, 122, 7.02, 4.35, 0]
 	6. Lane Johnson. OT. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. [9.29, 4.72, 28, 34, 118, 7.31, 4.52, 0]
 	7. Sheldon Richardson. DT. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 3, 0, 2, 1.5]. [9.07, 5.02, 30, 32, 116, 0, 0, 0]
 	8. Jonathan Cooper. OG. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. [8.69, 5.07, 35, 27, 108, 7.78, 4.84, 0]
@@ -73,13 +73,13 @@ Teams (2013):
 	20. Chicago Bears. [LB, OG, DL, CB]. OG Kyle Long
 	21. Cincinnati Bengals. [RB, S, LB, C, DE, WR]. TE Tyler Eifert
 	22. Atlanta Falcons. [CB, DE, LB, OT, TE, QB]. CB Desmond Trufant
-	23. Minnesota Vikings. [WR, LB, CB], DT Sharrif Floyd
+	23. Minnesota Vikings. [WR, LB, CB]. DT Sharrif Floyd
 	24. Indianapolis Colts. [OG, DL, CB, RB, C]. DE Bjoern Werner
-	25. Seattle Seahawks. [OT, CB, QB, DL, LB]. None
+	25. Minnesota Vikings. [WR, LB, CB]. CB Xavier Rhodes
 	26. Green Bay Packers. [S, RB, DL, OL, OLB]. DE Datone Jones
 	27. Houston Texans. [WR, OT, LB, NT, S]. WR DeAndre Hopkins
 	28. Denver Broncos. [DL, RB, LB, DB]. DT Sylvester Williams
-	29. New England Patriots. [DE, WR, CB, OG, DT]. None
+	29. Minnesota Vikings. [WR, LB, CB]. WR Cordarelle Patterson
 	30. Saint Louis Rams. [WR, S, RB, LB, OG]. LB Alec Obletree
 	31. Dallas Cowboys. [S, RT, OG, DL]. C Travis Frederick
 	32. Baltimore Ravens. [LB, S, WR, LT, C]. S Matt Elam

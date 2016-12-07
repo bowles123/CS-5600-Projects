@@ -9,7 +9,7 @@ Prospects (2014):
 	8. Eric Ebron. TE. [0, 0, 0, 0, 3.5, 2.33, 0.67, 0, 16.1, 601.67, 37.33, 2.67, 0, 0, 0, 0, 0]. [6.29, 4.60, 24, 32, 120, 0, 0, 0]
 	9. Zack Martin. OT. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. [6.23, 0, 29, 28, 106, 7.65, 4.59, 0]
 	10. Johnny Manziel. QB. [164.1, 3910, 31.5, 2.55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. [6.12, 4.68, 0, 31.5, 113, 6.75, 4.03, 0]
-	11. C.J. Mosley. LB. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79.25, 1.63, 1.75, 4.25, 0.25]. [6.42, 0, 0, 35, 118, 7.30, 4.40, 0]
+	11. CJ Mosley. LB. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79.25, 1.63, 1.75, 4.25, 0.25]. [6.42, 0, 0, 35, 118, 7.30, 4.40, 0]
 	12. Aaron Donald. DT. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45.25, 7.38, 0, 2.5, 1.5]. [6.34, 4.68, 35, 32, 116, 7.11, 4.39, 0]
 	13. Kyle Fuller. CB. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43.25, 1.13, 1.5, 5.25, 0.75]. [5.97, 4.49, 12, 38.5, 128, 6.90, 4.19, 0]
 	14. Anthony Barr. LB. [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 5.88, 0, 0.25, 1.5]. [6.52, 4.66, 15, 34.5, 119, 6.82, 4.19, 0]
@@ -52,9 +52,9 @@ Prospects (2014):
 
 Teams (2014):
 	1. Houston Texans. [QB, RT, OLB]. DE Jadeveion Clowney
-	2. St. Louis Rams. [WR, OL, S]. OT Greg Robinson
+	2. Saint Louis Rams. [WR, OL, S]. OT Greg Robinson
 	3. Jacksonville Jaguars. [QB, RB, OT]. QB Blake Bortles
-	4. Buffalo Bills. [RT, LB, WR].WR Sammy Watkins
+	4. Buffalo Bills. [RT, LB, WR]. WR Sammy Watkins
 	5. Oakland Raiders. [QB, OL, WR]. OLB Khalil Mack
 	6. Atlanta Falcons. [OLB, OT, TE]. OT Jake Matthews
 	7. Tampa Bay Buccaneers. [OT, OG, CB]. WR Mike Evans
@@ -82,4 +82,4 @@ Teams (2014):
 	29. New England Patriots. [DL, C, WR]. DT Dominique Easley
 	30. San Francisco 49ers. [WR, C, DL]. S Jimmie Ward
 	31. Denver Broncos. [CB, WR, LB]. CB Bradley Roby
-	32. Seattle Seahawks. [WR, TE, DL]. None
+	32. Minnesota Vikings. [QB, OG, S]. QB Teddy Bridgewater
